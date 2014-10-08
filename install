@@ -9,6 +9,7 @@ GRAPHITE_HOME='/opt/graphite'
 GRAPHITE_CONF="${GRAPHITE_HOME}/conf"
 GRAPHITE_STORAGE="${GRAPHITE_HOME}/storage"
 GRAPHITE_RELEASE='0.9.12'
+GRAFANA_RELEASE='1.8.1'
 
 if [[ ! $UBUNTU_RELEASE =~ 'Ubuntu 14.04.1 LTS' ]]; then
   echo "Sorry, this is only supported for Ubuntu Linux 14.04."
@@ -38,6 +39,12 @@ cd ../carbon; git checkout ${GRAPHITE_RELEASE}; pip install -r requirements.txt;
 cd ../graphite-web; git checkout ${GRAPHITE_RELEASE}; pip install -r requirements.txt; python check-dependencies.py; python setup.py install
 cd ../statsite; make; cp statsite /usr/local/sbin/; cp sinks/graphite.py /usr/local/sbin/statsite-sink-graphite.py
 
+# Download and extract Grafana release
+cd /opt; wget http://grafanarel.s3.amazonaws.com/grafana-${GRAFANA_RELEASE}.tar.gz
+tar zxf grafana-${GRAFANA_RELEASE}.tar.gz
+ln -s grafana-${GRAFANA_RELEASE} grafana
+cp ${SYNTHESIZE_HOME}/templates/grafana/config.js grafana/
+
 # Install configuration files for Graphite/Carbon and Apache
 cp ${SYNTHESIZE_HOME}/templates/statsite/statsite.conf /etc/statsite.conf
 mkdir ${GRAPHITE_CONF}/examples
@@ -45,13 +52,17 @@ mv ${GRAPHITE_CONF}/*.example ${GRAPHITE_CONF}/examples/
 cp ${SYNTHESIZE_HOME}/templates/graphite/conf/* ${GRAPHITE_CONF}/
 cp ${SYNTHESIZE_HOME}/templates/collectd/collectd.conf /etc/collectd/
 cp ${SYNTHESIZE_HOME}/templates/apache/graphite.conf /etc/apache2/sites-available/
+cp ${SYNTHESIZE_HOME}/templates/apache/grafana.conf /etc/apache2/sites-available/
+cp ${SYNTHESIZE_HOME}/templates/apache/ports.conf /etc/apache2/
 cp ${SYNTHESIZE_HOME}/templates/init/* /etc/init/
 cp ${SYNTHESIZE_HOME}/templates/init.d/* /etc/init.d/
 
 # Setup the correct Apache site and modules
 a2dissite 000-default
 a2ensite graphite
+a2ensite grafana
 a2enmod ssl
+a2enmod headers
 a2enmod socache_shmcb
 
 # Install configuration files for Django
