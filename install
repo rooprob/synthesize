@@ -49,10 +49,10 @@ cp ${SYNTHESIZE_HOME}/templates/init/* /etc/init/
 cp ${SYNTHESIZE_HOME}/templates/init.d/* /etc/init.d/
 
 # Setup the correct Apache site and modules
-a2dissite 000-default
-a2ensite graphite
-a2enmod ssl
-a2enmod socache_shmcb
+#a2dissite 000-default
+#a2ensite graphite
+#a2enmod ssl
+#a2enmod socache_shmcb
 
 # Install configuration files for Django
 cd ${GRAPHITE_HOME}/webapp/graphite
@@ -78,7 +78,7 @@ chmod +x /etc/init.d/carbon-cache
 service carbon-cache start
 service memcached start
 service collectd start
-service apache2 start
+# service apache2 start
 service statsite start
 
 # Fix log permissions after carbon starts
