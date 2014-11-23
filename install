@@ -15,8 +15,8 @@ if [[ ! $UBUNTU_RELEASE =~ 'Ubuntu 14.04.1 LTS' ]]; then
   exit 1
 fi
 if [[ -d $GRAPHITE_HOME ]]; then
-  echo "Looks like you already have a Graphite installation in ${GRAPHITE_HOME}, aborting."
-  exit 1
+    rm -fr $GRAPHITE_HOME
+    rm -fr /usr/local/src/*
 fi
 
 # Update apt since the vagrant image might be old
